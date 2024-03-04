@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  valorant-match-data-collection
+
+Transform:
+- AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Runtime: nodejs18.x
+    Timeout: 30
+    MemorySize: 128
+    Architectures:
+      - x86_64
+
+Resources:
+  GetMatchDataFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/get-match-data/ 
+      Handler: handler.handler
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:PutItem
+            Resource: 
+              - !GetAtt ValorantMatchDataTable.Arn
+      Environment:
+        Variables:
+          VALORANT_MATCH_DATA_TABLE: !Ref ValorantMatchDataTable
+      Events:
+        PostGamesTime:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0 3 * * ? *)
+            Enabled: true
+
+  ValorantMatchDataTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: valorant-match-data-table
+      PrimaryKey:
+        Name: matchId
+        Type: String
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
