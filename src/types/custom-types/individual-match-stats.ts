@@ -9,5 +9,5 @@ export interface IndividualMatchStats {
   kills: number
   deaths: number
   assists: number
-  ability_casts: AbilityCasts
+  abilityCasts: AbilityCasts
 }

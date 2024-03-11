@@ -5,5 +5,5 @@ export interface PlayerTeamData {
   playerName: string
   playerCharacter: Character
   playerTier: number
-  stats: IndividualMatchStats
+  playerStats: IndividualMatchStats
 }

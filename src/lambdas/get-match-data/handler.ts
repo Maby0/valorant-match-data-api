@@ -3,9 +3,15 @@ import { MABON_NAME, MABON_TAG } from '../../constants/player-names'
 import { ApiMatchData } from '../../types/api-types/api-match-data'
 import {
   filterOutNonFiveStackMatches,
-  addPlayerTeamProperty,
-  addPlayerWonProperty
+  addPlayerTeamColourProperty,
+  addPlayerWonProperty,
+  removeUnnecessaryProperties,
+  addPlayerTeamDataProperty,
+  addOpponentTeamDataProperty,
+  addOpponentTeamColourProperty,
+  mapApiMatchDataToCustomMatchData
 } from './util'
+import { inspect } from 'util'
 
 export const handler = async () => {
   const queryingPlayer = { name: MABON_NAME, tag: MABON_TAG }
@@ -20,10 +26,19 @@ export const handler = async () => {
 
   const matchData = responseData.data as ApiMatchData[]
   const matchDataFiveStackOnly = filterOutNonFiveStackMatches(matchData)
-  addPlayerTeamProperty(matchDataFiveStackOnly, queryingPlayer.name)
-  addPlayerWonProperty(matchDataFiveStackOnly)
-  // create the object with the necessary data and put to table
-  console.log(matchDataFiveStackOnly[0])
+
+  const customMatchDataList = matchDataFiveStackOnly.map((matchData) => {
+    removeUnnecessaryProperties(matchData)
+    addPlayerTeamColourProperty(matchData, queryingPlayer.name)
+    addOpponentTeamColourProperty(matchData)
+    addPlayerWonProperty(matchData)
+    addPlayerTeamDataProperty(matchData)
+    addOpponentTeamDataProperty(matchData)
+
+    return mapApiMatchDataToCustomMatchData(matchData)
+  })
+
+  console.log(inspect(customMatchDataList[1], true, null))
 }
 
 handler()

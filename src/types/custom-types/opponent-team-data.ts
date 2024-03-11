@@ -4,5 +4,5 @@ import { IndividualMatchStats } from './individual-match-stats'
 export interface OpponentTeamData {
   opponentCharacter: Character
   opponentTier: number
-  stats: IndividualMatchStats
+  opponentStats: IndividualMatchStats
 }
