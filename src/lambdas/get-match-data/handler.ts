@@ -11,7 +11,8 @@ import {
   addOpponentTeamColourProperty,
   mapApiMatchDataToCustomMatchData
 } from './util'
-import { inspect } from 'util'
+import { putItemToDynamo } from '../../aws/dynamodb/putItemToDynamo'
+import { getEnv } from '../../utils/get-env'
 
 export const handler = async () => {
   const queryingPlayer = { name: MABON_NAME, tag: MABON_TAG }
@@ -25,6 +26,7 @@ export const handler = async () => {
   })
 
   const matchData = responseData.data as ApiMatchData[]
+  console.log('Match data obtained - beginning mapping and filtering process')
   const matchDataFiveStackOnly = filterOutNonFiveStackMatches(matchData)
 
   const customMatchDataList = matchDataFiveStackOnly.map((matchData) => {
@@ -37,8 +39,12 @@ export const handler = async () => {
 
     return mapApiMatchDataToCustomMatchData(matchData)
   })
+  console.log('Match data mapped to custom type - sending to DB')
 
-  console.log(inspect(customMatchDataList[1], true, null))
+  await Promise.all(
+    customMatchDataList.map((customMatchData) => {
+      putItemToDynamo(getEnv('VALORANT_MATCH_DATA_TABLE'), customMatchData)
+    })
+  )
+  console.log('Match data successfully put to DB')
 }
-
-handler()
