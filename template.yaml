@@ -9,7 +9,7 @@ Globals:
   Function:
     Runtime: nodejs18.x
     Timeout: 30
-    MemorySize: 128
+    MemorySize: 512
     Architectures:
       - x86_64
 

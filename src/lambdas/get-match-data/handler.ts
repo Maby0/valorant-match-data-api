@@ -43,7 +43,10 @@ export const handler = async () => {
 
   await Promise.all(
     customMatchDataList.map((customMatchData) => {
-      putItemToDynamo(getEnv('VALORANT_MATCH_DATA_TABLE'), customMatchData)
+      return putItemToDynamo(
+        getEnv('VALORANT_MATCH_DATA_TABLE'),
+        customMatchData
+      )
     })
   )
   console.log('Match data successfully put to DB')
