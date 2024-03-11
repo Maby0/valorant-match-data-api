@@ -4,8 +4,8 @@ import {
   MABON_TAG,
   TEAM_INFO,
   TEAM_NAMES_LIST
-} from './player-names'
-import { MatchData } from '../../types/match-data'
+} from '../../constants/player-names'
+import { MatchData } from '../../types/api-types/match-data'
 
 export const handler = async () => {
   const valorantApi = new HenrikDevValorantApi()
@@ -20,6 +20,7 @@ export const handler = async () => {
   const matchData = responseData.data as MatchData[]
   const matchDataFiveStackOnly = filterOutNonFiveStackMatches(matchData)
   // create the object with the necessary data and put to table
+  console.log(matchDataFiveStackOnly[0].players.all_players)
 }
 
 const filterOutNonFiveStackMatches = (matchData: MatchData[]) => {
@@ -34,3 +35,5 @@ const filterOutNonFiveStackMatches = (matchData: MatchData[]) => {
     )
   })
 }
+
+handler()
