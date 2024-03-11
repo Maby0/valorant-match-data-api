@@ -1,39 +1,29 @@
 import HenrikDevValorantApi from 'unofficial-valorant-api'
+import { MABON_NAME, MABON_TAG } from '../../constants/player-names'
+import { ApiMatchData } from '../../types/api-types/api-match-data'
 import {
-  MABON_NAME,
-  MABON_TAG,
-  TEAM_INFO,
-  TEAM_NAMES_LIST
-} from '../../constants/player-names'
-import { MatchData } from '../../types/api-types/match-data'
+  filterOutNonFiveStackMatches,
+  addPlayerTeamProperty,
+  addPlayerWonProperty
+} from './util'
 
 export const handler = async () => {
+  const queryingPlayer = { name: MABON_NAME, tag: MABON_TAG }
   const valorantApi = new HenrikDevValorantApi()
   const responseData = await valorantApi.getMatches({
     region: 'eu',
-    name: MABON_NAME,
-    tag: MABON_TAG,
+    name: queryingPlayer.name,
+    tag: queryingPlayer.tag,
     filter: 'competitive',
     size: 10
   })
 
-  const matchData = responseData.data as MatchData[]
+  const matchData = responseData.data as ApiMatchData[]
   const matchDataFiveStackOnly = filterOutNonFiveStackMatches(matchData)
+  addPlayerTeamProperty(matchDataFiveStackOnly, queryingPlayer.name)
+  addPlayerWonProperty(matchDataFiveStackOnly)
   // create the object with the necessary data and put to table
-  console.log(matchDataFiveStackOnly[0].players.all_players)
-}
-
-const filterOutNonFiveStackMatches = (matchData: MatchData[]) => {
-  return matchData.filter((singleMatchData) => {
-    return (
-      singleMatchData.players.red.every((player) =>
-        TEAM_NAMES_LIST.includes(player.name)
-      ) ||
-      singleMatchData.players.blue.every((player) =>
-        TEAM_NAMES_LIST.includes(player.name)
-      )
-    )
-  })
+  console.log(matchDataFiveStackOnly[0])
 }
 
 handler()

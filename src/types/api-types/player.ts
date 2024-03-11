@@ -4,6 +4,7 @@ export interface Player {
   puuid: string
   name: string
   tag: string
+  team: 'red' | 'blue'
   level: number
   character: Character
   currenttier: number
