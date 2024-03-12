@@ -39,8 +39,8 @@ export const handler = async () => {
 
     return mapApiMatchDataToCustomMatchData(matchData)
   })
-  console.log('Match data mapped to custom type - sending to DB')
 
+  console.log('Match data mapped to custom type - sending to DB')
   await Promise.all(
     customMatchDataList.map((customMatchData) => {
       return putItemToDynamo(

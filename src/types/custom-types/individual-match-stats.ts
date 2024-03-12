@@ -10,4 +10,7 @@ export interface IndividualMatchStats {
   deaths: number
   assists: number
   abilityCasts: AbilityCasts
+  headshots: number
+  bodyshots: number
+  legshots: number
 }

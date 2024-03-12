@@ -67,7 +67,10 @@ export const addPlayerTeamDataProperty = (matchData: ApiMatchData) => {
             qCast: player.ability_casts.q_cast,
             eCast: player.ability_casts.e_cast,
             xCast: player.ability_casts.x_cast
-          }
+          },
+          headshots: player.stats.headshots,
+          bodyshots: player.stats.bodyshots,
+          legshots: player.stats.legshots
         }
       })
     }
@@ -91,7 +94,10 @@ export const addOpponentTeamDataProperty = (matchData: ApiMatchData) => {
             qCast: opponent.ability_casts.q_cast,
             eCast: opponent.ability_casts.e_cast,
             xCast: opponent.ability_casts.x_cast
-          }
+          },
+          headshots: opponent.stats.headshots,
+          bodyshots: opponent.stats.bodyshots,
+          legshots: opponent.stats.legshots
         }
       })
     }
