@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  valorant-match-data-api-internal
+
+Transform:
+- AWS::Serverless-2016-10-31
+
+Globals:
+  Api:
+    OpenApiVersion: 3.0.1
+  Function:
+    Runtime: nodejs18.x
+    Timeout: 30
+    MemorySize: 128
+    Architectures:
+      - x86_64
+
+Resources:
+  ValorantMatchDataApiInternal:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: valorant-match-data-api-internal
+      StageName: dev
+      DefinitionBody:
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: dist/open-api-specification.yaml
+
+  TestInternalApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-test-function
+      CodeUri: dist/test/
+      Handler: handler.handler
+
+  ApiGatewayInvokeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowApiGatewayServiceToAssumeRole
+            Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+      Policies:
+        - PolicyName: InvokeFunctions
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  - !GetAtt TestInternalApiFunction.Arn
+
+Outputs:
+  InternalApiBaseUrl:
+    Value: !Sub "https://${ValorantMatchDataApiInternal}.execute-api.${AWS::Region}.amazonaws.com/dev/"
+    Export:
+      Name: INTERNAL-API-BASE-URL
