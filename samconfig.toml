@@ -4,7 +4,7 @@ version = 0.1
 
 [default]
 [default.global.parameters]
-stack_name = "valorant-match-data-api"
+stack_name = "valorant-match-data-api-entry"
 
 [default.build.parameters]
 cached = true

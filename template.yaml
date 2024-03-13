@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  valorant-match-data-api
+  valorant-match-data-api-entry
 
 Transform:
 - AWS::Serverless-2016-10-31
@@ -25,13 +25,18 @@ Resources:
         'Fn::Transform':
           Name: 'AWS::Include'
           Parameters:
-            Location: dist/open-api-spec-entry.yaml
+            Location: dist/open-api-specification.yaml
 
   ValorantMatchDataApiEntryFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dist/entry/
       Handler: handler.handler
+      Environment:
+        Variables:
+          INTERNAL_API_BASE_URL: 
+            Fn::ImportValue: INTERNAL-API-BASE-URL
+
 
   ApiGatewayInvokeRole:
     Type: AWS::IAM::Role

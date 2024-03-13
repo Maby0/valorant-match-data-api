@@ -1,6 +1,6 @@
 openapi: '3.0.1'
 info:
-  title: 'My API'
+  title: 'valorant-match-data-api-entry'
 
 paths:
   /valorant-match-data-api-entry:

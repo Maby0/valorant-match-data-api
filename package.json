@@ -1,15 +1,14 @@
 {
-    "name": "valorant-match-data-collection",
+    "name": "valorant-match-data-api-entry",
     "version": "1.0.0",
     "scripts": {
-        "build": "mkdir -p dist && cp -f open-api-spec-entry.yaml dist/open-api-spec-entry.yaml && tsc --noEmit && ts-node ./esbuild.config.ts"
+        "build": "mkdir -p dist && cp -f open-api-specification.yaml dist/open-api-specification.yaml&& tsc --noEmit && ts-node ./esbuild.config.ts"
     },
     "dependencies": {
         "@aws-sdk/client-dynamodb": "^3.188.0",
         "@aws-sdk/lib-dynamodb": "^3.188.0",
-        "tweetnacl": "^1.0.3",
-        "unofficial-valorant-api": "^2.3.1-stable.0"
-    },
+        "tweetnacl": "^1.0.3"
+   },
     "devDependencies": {
         "@types/aws-lambda": "^8.10.131",
         "@types/node": "^20.11.5",
