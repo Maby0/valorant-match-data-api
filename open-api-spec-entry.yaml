@@ -3,7 +3,7 @@ info:
   title: 'My API'
 
 paths:
-  /test:
+  /valorant-match-data-api-entry:
     post:
       responses:
         '200':
@@ -16,4 +16,4 @@ paths:
         httpMethod: POST
         type: aws_proxy
         uri: 
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${PingLambda}/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${ValorantMatchDataApiEntryFunction}/invocations

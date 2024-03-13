@@ -16,21 +16,21 @@ Globals:
       - x86_64
 
 Resources:
-  ValorantMatchDataApi:
+  ValorantMatchDataApiEntry:
     Type: AWS::Serverless::Api
     Properties:
-      Name: valorant-match-data-api
+      Name: valorant-match-data-api-entry
       StageName: dev
       DefinitionBody:
         'Fn::Transform':
           Name: 'AWS::Include'
           Parameters:
-            Location: dist/open-api-specification.yaml
+            Location: dist/open-api-spec-entry.yaml
 
-  PingLambda:
+  ValorantMatchDataApiEntryFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/ping/
+      CodeUri: dist/entry/
       Handler: handler.handler
 
   ApiGatewayInvokeRole:
@@ -55,4 +55,4 @@ Resources:
                 Action:
                   - lambda:InvokeFunction
                 Resource:
-                  - !GetAtt PingLambda.Arn
+                  - !GetAtt ValorantMatchDataApiEntryFunction.Arn
