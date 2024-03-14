@@ -18,6 +18,10 @@ export const handler = async (
   const internalApiEndpoint = buildEndpointFromSlashCommandParameters(
     parsedDiscordRequest.data.options[0].value
   )
+  console.log(
+    'Constructed following endpoint from slash command params: ',
+    internalApiEndpoint
+  )
   if (internalApiEndpoint === 'commands') {
     return successfulDiscordResponse(listOfCommandsAsString)
   }
@@ -27,8 +31,9 @@ export const handler = async (
     if (response.status !== 200) {
       throw Error(`Internal API response not 200: ${response}`)
     }
-
-    return successfulDiscordResponse(await response.json())
+    const internalApiResult = await response.json()
+    console.log('Returning response: ', internalApiResult)
+    return successfulDiscordResponse(internalApiResult)
   } catch (error) {
     console.error(error)
     return unrecognisedParamsDiscordResponse()
