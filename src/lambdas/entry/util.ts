@@ -1,5 +1,6 @@
 export const buildEndpointFromSlashCommandParameters = (
   parameterString: string
 ) => {
-  return parameterString.replace(' ', '/')
+  const paramList = parameterString.split(' ')
+  return `${paramList[0]}?map=${paramList[1]}`
 }

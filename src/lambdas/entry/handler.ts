@@ -24,7 +24,9 @@ export const handler = async (
 
   try {
     const response = await sendRequestToInternalApi(internalApiEndpoint)
-    if (response.status !== 200) throw Error('Internal API response not 200')
+    if (response.status !== 200) {
+      throw Error(`Internal API response not 200: ${response}`)
+    }
 
     return successfulDiscordResponse(await response.json())
   } catch (error) {
