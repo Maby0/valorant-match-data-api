@@ -37,6 +37,12 @@ Resources:
             Schedule: cron(0 3 * * ? *)
             Enabled: true
 
+  ValorantMatchDataCollectionFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-function'
+      RetentionInDays: 30
+
   ValorantMatchDataTable:
     Type: AWS::Serverless::SimpleTable
     Properties:
