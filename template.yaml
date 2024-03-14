@@ -30,9 +30,56 @@ Resources:
   TestInternalApiFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: !Sub ${AWS::StackName}-test-function
       CodeUri: dist/test/
+      Environment:
+        Variables:
+          VALORANT_MATCH_DATA_TABLE: 
+            Fn::ImportValue: VALORANT-MATCH-DATA-TABLE-NAME
+      FunctionName: !Sub ${AWS::StackName}-test-function
       Handler: handler.handler
+      Role: !GetAtt StatGenerationLambdaRole.Arn
+
+  TestInternalApiFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-test-function'
+      RetentionInDays: 30
+  
+  StatGenerationLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: stat-generation-lambda-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowStatGenerationLambdaToAssumeRole
+            Effect: Allow
+            Action: 
+              - sts:AssumeRole
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+      Policies:
+        - PolicyName: WriteToLogGroup
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+        - PolicyName: DynamoDbAccessPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:Query
+                Resource:
+                  - Fn::ImportValue: VALORANT-MATCH-DATA-TABLE-ARN
 
   ApiGatewayInvokeRole:
     Type: AWS::IAM::Role
