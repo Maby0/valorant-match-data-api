@@ -5,7 +5,7 @@ export const LLYWELYN_NAME = 'Llywelyn'
 export const MABON_NAME = 'Mabyo'
 export const OWAIN_NAME = 'BradleySwiggins'
 export const SION_NAME = 'GingerBinger'
-export const SOPHIE_NAME = 'scl'
+export const SOPHIE_NAME = 'Scl'
 
 export const GARRIN_TAG = '6350'
 export const JAC_TAG = 'EUW'

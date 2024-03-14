@@ -14,10 +14,11 @@ Globals:
       - x86_64
 
 Resources:
-  GetMatchDataFunction:
+  ValorantMatchDataCollectionFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dist/get-match-data/ 
+      FunctionName: !Sub ${AWS::StackName}-function
       Handler: handler.handler
       Policies:
         - Statement:
@@ -46,3 +47,16 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
+
+Outputs:
+  ValorantMatchDataTableName:
+    Description: "Name of the match data table"
+    Value: !Ref ValorantMatchDataTable
+    Export:
+      Name: VALORANT-MATCH-DATA-TABLE-NAME
+
+  ValorantMatchDataTableArn:
+    Description: "ARN of the match data table"
+    Value: !GetAtt  ValorantMatchDataTable.Arn
+    Export:
+      Name: VALORANT-MATCH-DATA-TABLE-ARN
