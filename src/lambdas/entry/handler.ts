@@ -1,31 +1,34 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import { isRequestVerified } from './is-request-verified'
-import { getEnv } from '../../utils/get-env'
+import { isRequestVerified, validateRequestContent } from './request-validation'
+import {
+  successfulDiscordResponse,
+  unrecognisedParamsDiscordResponse
+} from './build-response'
+import { sendRequestToInternalApi } from './send-request-to-internal-api'
+import { buildEndpointFromSlashCommandParameters } from './util'
+import { listOfCommandsAsString } from '../../constants/commands'
 
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   if (!isRequestVerified(event)) {
-    return {
-      statusCode: 401,
-      headers: { 'Content-Type': 'application/json' },
-      isBase64Encoded: false,
-      body: JSON.stringify({ message: 'invalid request signature' })
-    }
+    return unrecognisedParamsDiscordResponse()
   }
-  console.log('this is event: ', event)
+  const parsedDiscordRequest = validateRequestContent(event)
+  const internalApiEndpoint = buildEndpointFromSlashCommandParameters(
+    parsedDiscordRequest.data.options[0].value
+  )
+  if (internalApiEndpoint === 'commands') {
+    return successfulDiscordResponse(listOfCommandsAsString)
+  }
 
   try {
-    const response = await fetch(`${getEnv('INTERNAL_API_URL')}`)
-    console.log('this is the response: ', response)
+    const response = await sendRequestToInternalApi(internalApiEndpoint)
+    if (response.status !== 200) throw Error('Internal API response not 200')
+
+    return successfulDiscordResponse(await response.json())
   } catch (error) {
     console.error(error)
-  }
-
-  return {
-    statusCode: 200,
-    headers: { 'Content-Type': 'application/json' },
-    isBase64Encoded: false,
-    body: JSON.stringify({ type: 1 })
+    return unrecognisedParamsDiscordResponse()
   }
 }

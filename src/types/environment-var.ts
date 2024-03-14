@@ -1,3 +1,3 @@
 export interface EnvironmentVar {
-  name: 'INTERNAL_API_URL'
+  name: 'INTERNAL_API_BASE_URL'
 }

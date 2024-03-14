@@ -1,5 +1,6 @@
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import nacl from 'tweetnacl'
+import { DiscordInteraction } from '../../types/discord-interaction'
 
 export const isRequestVerified = (event: APIGatewayProxyEvent): boolean => {
   const PUBLIC_KEY =
@@ -18,4 +19,14 @@ export const isRequestVerified = (event: APIGatewayProxyEvent): boolean => {
     Buffer.from(signature, 'hex'),
     Buffer.from(PUBLIC_KEY, 'hex')
   )
+}
+
+export const validateRequestContent = (event: APIGatewayProxyEvent) => {
+  const discordInteraction = JSON.parse(
+    event.body ?? '{}'
+  ) as DiscordInteraction
+  if (discordInteraction.data.name !== 'valpal') {
+    throw Error('Unrecognised base command')
+  }
+  return discordInteraction
 }

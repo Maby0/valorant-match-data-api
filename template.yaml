@@ -19,24 +19,30 @@ Resources:
   ValorantMatchDataApiEntry:
     Type: AWS::Serverless::Api
     Properties:
-      Name: valorant-match-data-api-entry
-      StageName: dev
       DefinitionBody:
         'Fn::Transform':
           Name: 'AWS::Include'
           Parameters:
             Location: dist/open-api-specification.yaml
+      Name: !Sub ${AWS::StackName}
+      StageName: dev
 
   ValorantMatchDataApiEntryFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: dist/entry/
-      Handler: handler.handler
       Environment:
         Variables:
           INTERNAL_API_BASE_URL: 
             Fn::ImportValue: INTERNAL-API-BASE-URL
-
+      FunctionName: !Sub ${AWS::StackName}-main-function
+      Handler: handler.handler
+      
+  ValorantMatchDataApiEntryFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-main-function'
+      RetentionInDays: 30
 
   ApiGatewayInvokeRole:
     Type: AWS::IAM::Role
