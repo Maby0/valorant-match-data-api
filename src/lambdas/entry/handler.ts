@@ -1,8 +1,10 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { isRequestVerified, validateRequestContent } from './request-validation'
 import {
+  internalApiErrorDiscordResponse,
   successfulDiscordResponse,
-  unrecognisedParamsDiscordResponse
+  unrecognisedParamsDiscordResponse,
+  unverifiedDiscordRequestResponse
 } from './build-response'
 import { sendRequestToInternalApi } from './send-request-to-internal-api'
 import { buildEndpointFromSlashCommandParameters } from './util'
@@ -12,7 +14,7 @@ export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   if (!isRequestVerified(event)) {
-    return unrecognisedParamsDiscordResponse()
+    return unverifiedDiscordRequestResponse()
   }
   const parsedDiscordRequest = validateRequestContent(event)
   const internalApiEndpoint = buildEndpointFromSlashCommandParameters(
@@ -29,13 +31,17 @@ export const handler = async (
   try {
     const response = await sendRequestToInternalApi(internalApiEndpoint)
     if (response.status !== 200) {
-      throw Error(`Internal API response not 200: ${response}`)
+      throw Error(`Internal API response not 200`, { cause: response.status })
     }
     const internalApiResult = await response.json()
     console.log('Returning response: ', internalApiResult)
     return successfulDiscordResponse(internalApiResult)
   } catch (error) {
     console.error(error)
-    return unrecognisedParamsDiscordResponse()
+
+    if ((error as Error).cause === 403) {
+      return unrecognisedParamsDiscordResponse()
+    }
+    return internalApiErrorDiscordResponse()
   }
 }
