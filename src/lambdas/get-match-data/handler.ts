@@ -1,5 +1,10 @@
 import HenrikDevValorantApi from 'unofficial-valorant-api'
-import { MABON_NAME, MABON_TAG } from '../../constants/player-names'
+import {
+  MABON_NAME,
+  MABON_SMURF_NAME,
+  MABON_SMURF_TAG,
+  MABON_TAG
+} from '../../constants/player-names'
 import { ApiMatchData } from '../../types/api-types/api-match-data'
 import {
   filterOutNonFiveStackMatches,
@@ -11,11 +16,11 @@ import {
   addOpponentTeamColourProperty,
   mapApiMatchDataToCustomMatchData
 } from './util'
-import { putItemToDynamo } from '../../aws/dynamodb/putItemToDynamo'
 import { getEnv } from '../../utils/get-env'
+import { putItemToDynamo } from '../../aws/dynamodb/put-item-to-dynamo'
 
 export const handler = async () => {
-  const queryingPlayer = { name: MABON_NAME, tag: MABON_TAG }
+  const queryingPlayer = { name: MABON_SMURF_NAME, tag: MABON_SMURF_TAG }
   const valorantApi = new HenrikDevValorantApi()
   const responseData = await valorantApi.getMatches({
     region: 'eu',
@@ -26,7 +31,9 @@ export const handler = async () => {
   })
 
   const matchData = responseData.data as ApiMatchData[]
-  console.log('Match data obtained - beginning mapping and filtering process')
+  console.log(
+    `Match data obtained for ${queryingPlayer.name} - beginning mapping and filtering process`
+  )
   const matchDataFiveStackOnly = filterOutNonFiveStackMatches(matchData)
 
   const customMatchDataList = matchDataFiveStackOnly.map((matchData) => {
