@@ -43,16 +43,42 @@ Resources:
       LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-function'
       RetentionInDays: 30
 
+  # ValorantMatchDataTable:
+  #   Type: AWS::Serverless::SimpleTable
+  #   Properties:
+  #     TableName: valorant-match-data-table
+  #     PrimaryKey:
+  #       Name: matchId
+  #       Type: String
+  #     ProvisionedThroughput:
+  #       ReadCapacityUnits: 2
+  #       WriteCapacityUnits: 2
+
   ValorantMatchDataTable:
-    Type: AWS::Serverless::SimpleTable
+    Type: AWS::DynamoDB::Table
     Properties:
       TableName: valorant-match-data-table
-      PrimaryKey:
-        Name: matchId
-        Type: String
+      AttributeDefinitions:
+        - AttributeName: matchId
+          AttributeType: S
+        - AttributeName: map
+          AttributeType: S
+      KeySchema:
+        - AttributeName: matchId
+          KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
+      GlobalSecondaryIndexes:
+        - IndexName: map
+          KeySchema:
+            - AttributeName: map
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
 
 Outputs:
   ValorantMatchDataTableName:
@@ -62,7 +88,7 @@ Outputs:
       Name: VALORANT-MATCH-DATA-TABLE-NAME
 
   ValorantMatchDataTableArn:
-    Description: "ARN of the match data table"
-    Value: !GetAtt  ValorantMatchDataTable.Arn
+    Description: ARN of the match data table
+    Value: !GetAtt ValorantMatchDataTable.Arn
     Export:
       Name: VALORANT-MATCH-DATA-TABLE-ARN
