@@ -3,7 +3,7 @@ info:
   title: 'valorant-match-data-api-internal'
 
 paths:
-  /test:
+  /map-winrate:
     get:
       responses:
         '200':
@@ -25,4 +25,4 @@ paths:
         httpMethod: POST
         type: aws_proxy
         uri:
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${TestInternalApiFunction}/invocations
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${MapWinrateFunction}/invocations

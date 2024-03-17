@@ -27,22 +27,22 @@ Resources:
           Parameters:
             Location: dist/open-api-specification.yaml
 
-  TestInternalApiFunction:
+  MapWinrateFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: dist/test/
+      CodeUri: dist/map-winrate/
       Environment:
         Variables:
           VALORANT_MATCH_DATA_TABLE: 
             Fn::ImportValue: VALORANT-MATCH-DATA-TABLE-NAME
-      FunctionName: !Sub ${AWS::StackName}-test-function
+      FunctionName: !Sub ${AWS::StackName}-map-winrate-function
       Handler: handler.handler
       Role: !GetAtt StatGenerationLambdaRole.Arn
 
-  TestInternalApiFunctionLogs:
+  MapWinrateFunctionLogs:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-test-function'
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-map-winrate-function'
       RetentionInDays: 30
   
   StatGenerationLambdaRole:
@@ -79,7 +79,10 @@ Resources:
                   - dynamodb:GetItem
                   - dynamodb:Query
                 Resource:
-                  - Fn::ImportValue: VALORANT-MATCH-DATA-TABLE-ARN
+                  - Fn::Join:
+                    - ''
+                    - - Fn::ImportValue: VALORANT-MATCH-DATA-TABLE-ARN
+                      - '*'
 
   ApiGatewayInvokeRole:
     Type: AWS::IAM::Role
@@ -103,7 +106,7 @@ Resources:
                 Action:
                   - lambda:InvokeFunction
                 Resource:
-                  - !GetAtt TestInternalApiFunction.Arn
+                  - !GetAtt MapWinrateFunction.Arn
 
 Outputs:
   InternalApiBaseUrl:
