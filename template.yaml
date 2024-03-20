@@ -43,17 +43,6 @@ Resources:
       LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-function'
       RetentionInDays: 30
 
-  # ValorantMatchDataTable:
-  #   Type: AWS::Serverless::SimpleTable
-  #   Properties:
-  #     TableName: valorant-match-data-table
-  #     PrimaryKey:
-  #       Name: matchId
-  #       Type: String
-  #     ProvisionedThroughput:
-  #       ReadCapacityUnits: 2
-  #       WriteCapacityUnits: 2
-
   ValorantMatchDataTable:
     Type: AWS::DynamoDB::Table
     Properties:
