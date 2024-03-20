@@ -1,6 +1,11 @@
-export const buildEndpointFromSlashCommandParameters = (
+import { getEnv } from '../../utils/get-env'
+
+export const buildLambdaInvocationRequirementsFromSlashCommand = (
   parameterString: string
 ) => {
   const paramList = parameterString.split(' ')
-  return paramList[0] + (paramList[1] ? `?map=${paramList[1]}` : '')
+  return {
+    internalLambdaName: `${getEnv('INTERNAL_AWS_STACK_NAME')}-${paramList[0]}-function`,
+    payload: paramList[1]
+  }
 }

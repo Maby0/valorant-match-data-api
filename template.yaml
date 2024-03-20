@@ -33,8 +33,7 @@ Resources:
       CodeUri: dist/entry/
       Environment:
         Variables:
-          INTERNAL_API_BASE_URL: 
-            Fn::ImportValue: INTERNAL-API-BASE-URL
+          INTERNAL_AWS_STACK_NAME: !ImportValue INTERNAL-AWS-STACK-NAME
       FunctionName: !Sub ${AWS::StackName}-main-function
       Handler: handler.handler
       

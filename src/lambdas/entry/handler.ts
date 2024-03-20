@@ -1,14 +1,12 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { isRequestVerified, validateRequestContent } from './request-validation'
 import {
-  internalApiErrorDiscordResponse,
-  successfulDiscordResponse,
-  unrecognisedParamsDiscordResponse,
+  deferralDiscordResponse,
+  listCommandsDiscordRequestResponse,
   unverifiedDiscordRequestResponse
 } from './build-response'
-import { sendRequestToInternalApi } from './send-request-to-internal-api'
-import { buildEndpointFromSlashCommandParameters } from './util'
-import { listOfCommandsAsString } from '../../constants/commands'
+import { buildLambdaInvocationRequirementsFromSlashCommand } from './util'
+import { invokeLambda } from '../../aws/invoke-lambda'
 
 export const handler = async (
   event: APIGatewayProxyEvent
@@ -17,31 +15,24 @@ export const handler = async (
     return unverifiedDiscordRequestResponse()
   }
   const parsedDiscordRequest = validateRequestContent(event)
-  const internalApiEndpoint = buildEndpointFromSlashCommandParameters(
-    parsedDiscordRequest.data.options[0].value
-  )
+  const { internalLambdaName, payload } =
+    buildLambdaInvocationRequirementsFromSlashCommand(
+      parsedDiscordRequest.data.options[0].value
+    )
   console.log(
-    'Constructed following endpoint from slash command params: ',
-    internalApiEndpoint
+    'Constructed following lambda name from slash command params: ',
+    internalLambdaName,
+    'With following payload: ',
+    payload
   )
-  if (internalApiEndpoint === 'commands') {
-    return successfulDiscordResponse(listOfCommandsAsString)
+  if (internalLambdaName === 'commands') {
+    return listCommandsDiscordRequestResponse()
   }
 
-  try {
-    const response = await sendRequestToInternalApi(internalApiEndpoint)
-    if (response.status !== 200) {
-      throw Error(`Internal API response not 200`, { cause: response.status })
-    }
-    const internalApiResult = await response.json()
-    console.log('Returning response: ', internalApiResult)
-    return successfulDiscordResponse(internalApiResult)
-  } catch (error) {
-    console.error(error)
-
-    if ((error as Error).cause === 403) {
-      return unrecognisedParamsDiscordResponse()
-    }
-    return internalApiErrorDiscordResponse()
-  }
+  invokeLambda(internalLambdaName, {
+    applicationId: parsedDiscordRequest.application_id,
+    interactionToken: parsedDiscordRequest.token,
+    payload
+  })
+  return deferralDiscordResponse()
 }
