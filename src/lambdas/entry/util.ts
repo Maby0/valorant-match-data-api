@@ -1,11 +1,13 @@
-import { getEnv } from '../../utils/get-env'
+import { COMMANDS, COMMANDS_LIST_FOR_USER } from '../../constants/commands'
 
 export const buildLambdaInvocationRequirementsFromSlashCommand = (
   parameterString: string
 ) => {
   const paramList = parameterString.split(' ')
+  const command = paramList[0].toLowerCase()
+  const payload = paramList[1]
   return {
-    internalLambdaName: `${getEnv('INTERNAL_AWS_STACK_NAME')}-${paramList[0]}-function`,
-    payload: paramList[1]
+    command,
+    payload
   }
 }

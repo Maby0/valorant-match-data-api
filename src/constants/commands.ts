@@ -1,7 +1,5 @@
-export const commands = [
-  'map-winrate <map-name>',
-  'placeholder1',
-  'placeholder2'
-]
-export const commandsFormatted = commands.join('\n')
-export const listOfCommandsAsString = `These are the current working commands:\n${commandsFormatted}`
+export enum COMMANDS {
+  MAP_WINRATE = 'map-winrate'
+}
+
+export const COMMANDS_LIST_FOR_USER = [`${COMMANDS.MAP_WINRATE} <map-name>`]

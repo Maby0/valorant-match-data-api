@@ -1,4 +1,4 @@
-import { listOfCommandsAsString } from '../../constants/commands'
+import { COMMANDS_LIST_FOR_USER } from '../../constants/commands'
 
 export const buildDiscordResponse = (responseSpecifics: {
   statusCode: number
@@ -37,7 +37,7 @@ export const listCommandsDiscordRequestResponse = () => ({
   ...buildDiscordResponse({
     statusCode: 200,
     type: 4,
-    responseContent: listOfCommandsAsString
+    responseContent: `These are the current working commands:\n${COMMANDS_LIST_FOR_USER.join('\n')}`
   })
 })
 
