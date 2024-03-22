@@ -1,3 +1,3 @@
 export const formatPercentageToString = (rawPercentage: number) => {
-  return rawPercentage.toString() + '%'
+  return Math.ceil(rawPercentage).toString() + '%'
 }

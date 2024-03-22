@@ -16,17 +16,6 @@ Globals:
       - x86_64
 
 Resources:
-  ValorantMatchDataApiInternal:
-    Type: AWS::Serverless::Api
-    Properties:
-      Name: valorant-match-data-api-internal
-      StageName: dev
-      DefinitionBody:
-        'Fn::Transform':
-          Name: 'AWS::Include'
-          Parameters:
-            Location: dist/open-api-specification.yaml
-
   MapWinrateFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -84,32 +73,13 @@ Resources:
                     - - Fn::ImportValue: VALORANT-MATCH-DATA-TABLE-ARN
                       - '*'
 
-  ApiGatewayInvokeRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Sid: AllowApiGatewayServiceToAssumeRole
-            Effect: Allow
-            Action:
-              - sts:AssumeRole
-            Principal:
-              Service:
-                - apigateway.amazonaws.com
-      Policies:
-        - PolicyName: InvokeFunctions
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action:
-                  - lambda:InvokeFunction
-                Resource:
-                  - !GetAtt MapWinrateFunction.Arn
-
 Outputs:
-  InternalApiBaseUrl:
-    Value: !Sub "https://${ValorantMatchDataApiInternal}.execute-api.${AWS::Region}.amazonaws.com/dev/"
+  InternalAwsStackName:
+    Value: !Sub ${AWS::StackName}
     Export:
-      Name: INTERNAL-API-BASE-URL
+      Name: INTERNAL-AWS-STACK-NAME
+
+  MapWinrateFunctionArn:
+    Value: !GetAtt MapWinrateFunction.Arn
+    Export:
+      Name: MAP-WINRATE-FUNCTION-ARN
