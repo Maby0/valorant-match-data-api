@@ -2,7 +2,7 @@
     "name": "valorant-match-data-api-internal",
     "version": "1.0.0",
     "scripts": {
-        "build": "mkdir -p dist && cp -f open-api-specification.yaml dist/open-api-specification.yaml && tsc --noEmit && ts-node ./esbuild.config.ts"
+        "build": "mkdir -p dist && tsc --noEmit && ts-node ./esbuild.config.ts"
     },
     "dependencies": {
         "@aws-sdk/client-dynamodb": "^3.188.0",

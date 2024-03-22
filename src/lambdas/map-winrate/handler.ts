@@ -1,15 +1,15 @@
-import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda'
 import { queryItemsFromDynamo } from '../../aws/dynamodb/query-items-from-dynamo'
 import { getEnv } from '../../util/get-env'
 import { toTitleCase } from '../../util/to-title-case'
 import { calculateWinratePercentage } from './calculate-winrate'
 import { MapWinrateData } from '../../util/map-winrate-data'
 import { formatPercentageToString } from '../../util/format-percentage-to-string'
+import { LambdaInvocationParams } from '../../types/lambda-invocation-params'
+import { sendFollowUpMessage } from '../../util/send-follow-up-message'
 
-export const handler = async (
-  event: APIGatewayEvent
-): Promise<APIGatewayProxyResult> => {
-  const mapToQuery = toTitleCase(event.queryStringParameters?.map ?? '')
+export const handler = async (event: LambdaInvocationParams) => {
+  console.log('im an invoked event: ', event)
+  const mapToQuery = toTitleCase(event.payload)
   console.log('Map to query winrate: ', mapToQuery)
   const mapSpecificData = await queryItemsFromDynamo(
     getEnv('VALORANT_MATCH_DATA_TABLE'),
@@ -22,17 +22,17 @@ export const handler = async (
   const mapWinrateData = mapSpecificData.Items as MapWinrateData[]
 
   if (!mapWinrateData.length) {
-    return {
-      statusCode: 200,
-      body: JSON.stringify('No winrate data found for map: ' + mapToQuery)
-    }
+    return await sendFollowUpMessage(
+      event.applicationId,
+      event.interactionToken,
+      'No winrate data found for map: ' + mapToQuery
+    )
   }
 
   const mapWinrate = calculateWinratePercentage(mapWinrateData)
-  return {
-    statusCode: 200,
-    body: JSON.stringify(
-      `Winrate on ${mapToQuery} is ${formatPercentageToString(mapWinrate)}`
-    )
-  }
+  return await sendFollowUpMessage(
+    event.applicationId,
+    event.interactionToken,
+    `Winrate on ${mapToQuery} is ${formatPercentageToString(mapWinrate)}`
+  )
 }
