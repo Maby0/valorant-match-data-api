@@ -4,6 +4,7 @@ export const JAC_NAME = 'ItsJustMono'
 export const LLOYD_NAME = 'Cornishiwa'
 export const LLOYD_SMURF_NAME = 'BitterSun'
 export const LLYWELYN_NAME = 'Llywelyn'
+export const LLYWELYN_SMURF_NAME = 'Cowderoy'
 export const MABON_NAME = 'Mabyo'
 export const MABON_SMURF_NAME = 'seb0n'
 export const OWAIN_NAME = 'BradleySwiggins'
@@ -16,6 +17,7 @@ export const JAC_TAG = 'EUW'
 export const LLOYD_TAG = 'EUW'
 export const LLOYD_SMURF_TAG = 'EUW'
 export const LLYWELYN_TAG = 'EUW'
+export const LLYWELYN_SMURF_TAG = '2870'
 export const MABON_TAG = 'EUW'
 export const MABON_SMURF_TAG = 'EUW'
 export const OWAIN_TAG = '9080'
@@ -29,6 +31,7 @@ export const TEAM_INFO = [
   { name: LLOYD_NAME, tag: LLOYD_TAG },
   { name: LLOYD_SMURF_NAME, tag: LLOYD_SMURF_TAG },
   { name: LLYWELYN_NAME, tag: LLYWELYN_TAG },
+  { name: LLYWELYN_SMURF_NAME, tag: LLYWELYN_SMURF_TAG },
   { name: MABON_NAME, tag: MABON_TAG },
   { name: MABON_SMURF_NAME, tag: MABON_SMURF_TAG },
   { name: OWAIN_NAME, tag: OWAIN_TAG },
@@ -43,6 +46,7 @@ export const TEAM_NAMES_LIST = [
   LLOYD_NAME,
   LLOYD_SMURF_NAME,
   LLYWELYN_NAME,
+  LLYWELYN_SMURF_NAME,
   MABON_NAME,
   MABON_SMURF_NAME,
   OWAIN_NAME,
