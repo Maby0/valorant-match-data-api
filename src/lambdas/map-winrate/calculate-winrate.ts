@@ -1,4 +1,4 @@
-import { MapWinrateData } from '../../util/map-winrate-data'
+import { MapWinrateData } from '../../types/query-types/major/map-winrate-data'
 
 export const calculateWinratePercentage = (
   mapWinrateData: MapWinrateData[]

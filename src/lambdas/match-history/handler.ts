@@ -1,16 +1,15 @@
+import { toTitleCase } from '../../util/to-title-case'
+import { LambdaInvocationParams } from '../../types/lambda-invocation-params'
 import { queryItemsFromDynamo } from '../../aws/dynamodb/query-items-from-dynamo'
 import { getEnv } from '../../util/get-env'
-import { toTitleCase } from '../../util/to-title-case'
-import { calculateWinratePercentage } from './calculate-winrate'
-import { MapWinrateData } from '../../types/query-types/major/map-winrate-data'
-import { formatPercentageToString } from '../../util/format-percentage-to-string'
-import { LambdaInvocationParams } from '../../types/lambda-invocation-params'
+import { MatchHistoryData } from '../../types/query-types/major/match-history-data'
 import { sendFollowUpMessage } from '../../util/send-follow-up-message'
+import { formatMatchHistory } from './format-match-history'
 import { MAP_GAME_START_GSI } from '../../constants'
 
 export const handler = async (event: LambdaInvocationParams) => {
   const mapToQuery = toTitleCase(event.payload)
-  console.log('Map to query winrate: ', mapToQuery)
+  console.log('Map to query match history: ', mapToQuery)
   try {
     const mapSpecificData = await queryItemsFromDynamo(
       getEnv('VALORANT_MATCH_DATA_TABLE'),
@@ -18,30 +17,33 @@ export const handler = async (event: LambdaInvocationParams) => {
       '#mapAttribute = :map',
       { '#mapAttribute': 'map' },
       { ':map': mapToQuery },
-      'matchId, #mapAttribute, playerHasWon'
+      'gameStart, #mapAttribute, playerHasWon, playerRoundsWon, playerRoundsLost, playerTeamData, opponentTeamData'
     )
-    const mapWinrateData = mapSpecificData.Items as MapWinrateData[]
+    const mapMatchHistoryData = mapSpecificData.Items as MatchHistoryData[]
 
-    if (!mapWinrateData.length) {
+    if (!mapMatchHistoryData.length) {
       return await sendFollowUpMessage(
         event.applicationId,
         event.interactionToken,
-        'No winrate data found for map: ' + mapToQuery
+        'No match history data found for map: ' + mapToQuery
       )
     }
 
-    const mapWinrate = calculateWinratePercentage(mapWinrateData)
+    const formattedMatchHistory = formatMatchHistory(
+      mapToQuery,
+      mapMatchHistoryData
+    )
     return await sendFollowUpMessage(
       event.applicationId,
       event.interactionToken,
-      `Winrate on ${mapToQuery} is ${formatPercentageToString(mapWinrate)}`
+      formattedMatchHistory
     )
   } catch (error) {
     console.error('An error occurred: ', error)
     return sendFollowUpMessage(
       event.applicationId,
       event.interactionToken,
-      'Something terrible probably happened internally soz'
+      'Something went wrong internally soz'
     )
   }
 }

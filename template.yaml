@@ -34,6 +34,24 @@ Resources:
       LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-map-winrate-function'
       RetentionInDays: 30
   
+  MatchHistoryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/match-history/
+      Environment:
+        Variables:
+          VALORANT_MATCH_DATA_TABLE: 
+            Fn::ImportValue: VALORANT-MATCH-DATA-TABLE-NAME
+      FunctionName: !Sub ${AWS::StackName}-match-history-function
+      Handler: handler.handler
+      Role: !GetAtt StatGenerationLambdaRole.Arn
+
+  MatchHistoryFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-match-history-function'
+      RetentionInDays: 30
+
   StatGenerationLambdaRole:
     Type: AWS::IAM::Role
     Properties:
@@ -83,3 +101,8 @@ Outputs:
     Value: !GetAtt MapWinrateFunction.Arn
     Export:
       Name: MAP-WINRATE-FUNCTION-ARN
+
+  MatchHistoryFunctionArn:
+    Value: !GetAtt MatchHistoryFunction.Arn
+    Export:
+      Name: MATCH-HISTORY-FUNCTION-ARN

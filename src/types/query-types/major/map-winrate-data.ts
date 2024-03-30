@@ -1,4 +1,4 @@
-import { Map } from '../types/map'
+import { Map } from '../minor/map'
 
 export interface MapWinrateData {
   matchId: string
