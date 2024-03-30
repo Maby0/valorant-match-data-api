@@ -101,3 +101,4 @@ Resources:
                   - lambda:InvokeFunction
                 Resource:
                   - !ImportValue MAP-WINRATE-FUNCTION-ARN
+                  - !ImportValue MATCH-HISTORY-FUNCTION-ARN
