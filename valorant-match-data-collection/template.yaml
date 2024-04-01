@@ -1,0 +1,87 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  valorant-match-data-collection
+
+Transform:
+- AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Runtime: nodejs18.x
+    Timeout: 30
+    MemorySize: 512
+    Architectures:
+      - x86_64
+
+Resources:
+  ValorantMatchDataCollectionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/get-match-data/ 
+      FunctionName: !Sub ${AWS::StackName}-function
+      Handler: handler.handler
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:PutItem
+            Resource: 
+              - !GetAtt ValorantMatchDataTable.Arn
+      Environment:
+        Variables:
+          VALORANT_MATCH_DATA_TABLE: !Ref ValorantMatchDataTable
+      Events:
+        PostGamesTime:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0 3 * * ? *)
+            Enabled: true
+
+  ValorantMatchDataCollectionFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-function'
+      RetentionInDays: 30
+
+  ValorantMatchDataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: valorant-match-data-table
+      AttributeDefinitions:
+        - AttributeName: matchId
+          AttributeType: S
+        - AttributeName: map
+          AttributeType: S
+        - AttributeName: gameStart
+          AttributeType: N
+      KeySchema:
+        - AttributeName: matchId
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+      GlobalSecondaryIndexes:
+        - IndexName: mapGameStart
+          KeySchema:
+            - AttributeName: map
+              KeyType: HASH
+            - AttributeName: gameStart
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+          ProvisionedThroughput:
+            ReadCapacityUnits: 1
+            WriteCapacityUnits: 1
+
+Outputs:
+  ValorantMatchDataTableName:
+    Description: "Name of the match data table"
+    Value: !Ref ValorantMatchDataTable
+    Export:
+      Name: VALORANT-MATCH-DATA-TABLE-NAME
+
+  ValorantMatchDataTableArn:
+    Description: ARN of the match data table
+    Value: !GetAtt ValorantMatchDataTable.Arn
+    Export:
+      Name: VALORANT-MATCH-DATA-TABLE-ARN

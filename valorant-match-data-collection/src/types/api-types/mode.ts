@@ -1,0 +1,10 @@
+export type Mode =
+  | 'escalation'
+  | 'spikerush'
+  | 'deathmatch'
+  | 'competitive'
+  | 'unrated'
+  | 'replication'
+  | 'custom'
+  | 'newmap'
+  | 'snowball'
