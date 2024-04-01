@@ -1,0 +1,108 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  valorant-match-data-api-internal
+
+Transform:
+- AWS::Serverless-2016-10-31
+
+Globals:
+  Api:
+    OpenApiVersion: 3.0.1
+  Function:
+    Runtime: nodejs18.x
+    Timeout: 30
+    MemorySize: 128
+    Architectures:
+      - x86_64
+
+Resources:
+  MapWinrateFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/map-winrate/
+      Environment:
+        Variables:
+          VALORANT_MATCH_DATA_TABLE: 
+            Fn::ImportValue: VALORANT-MATCH-DATA-TABLE-NAME
+      FunctionName: !Sub ${AWS::StackName}-map-winrate-function
+      Handler: handler.handler
+      Role: !GetAtt StatGenerationLambdaRole.Arn
+
+  MapWinrateFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-map-winrate-function'
+      RetentionInDays: 30
+  
+  MatchHistoryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/match-history/
+      Environment:
+        Variables:
+          VALORANT_MATCH_DATA_TABLE: 
+            Fn::ImportValue: VALORANT-MATCH-DATA-TABLE-NAME
+      FunctionName: !Sub ${AWS::StackName}-match-history-function
+      Handler: handler.handler
+      Role: !GetAtt StatGenerationLambdaRole.Arn
+
+  MatchHistoryFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-match-history-function'
+      RetentionInDays: 30
+
+  StatGenerationLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: stat-generation-lambda-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowStatGenerationLambdaToAssumeRole
+            Effect: Allow
+            Action: 
+              - sts:AssumeRole
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+      Policies:
+        - PolicyName: WriteToLogGroup
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+        - PolicyName: DynamoDbAccessPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:Query
+                Resource:
+                  - Fn::Join:
+                    - ''
+                    - - Fn::ImportValue: VALORANT-MATCH-DATA-TABLE-ARN
+                      - '*'
+
+Outputs:
+  InternalAwsStackName:
+    Value: !Sub ${AWS::StackName}
+    Export:
+      Name: INTERNAL-AWS-STACK-NAME
+
+  MapWinrateFunctionArn:
+    Value: !GetAtt MapWinrateFunction.Arn
+    Export:
+      Name: MAP-WINRATE-FUNCTION-ARN
+
+  MatchHistoryFunctionArn:
+    Value: !GetAtt MatchHistoryFunction.Arn
+    Export:
+      Name: MATCH-HISTORY-FUNCTION-ARN
