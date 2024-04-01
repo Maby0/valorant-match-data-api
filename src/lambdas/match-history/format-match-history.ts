@@ -10,13 +10,14 @@ export const formatMatchHistory = (
   for (const matchHistoryData of mapMatchHistoryData) {
     const teamComp = matchHistoryData.playerTeamData
       .map((playerData) => playerData.playerCharacter)
+      .sort()
       .join(', ')
     rows.push({
       'Game Start': formatDate(new Date(matchHistoryData.gameStart * 1000)),
       'Win?': matchHistoryData.playerHasWon,
-      'Agents Played': teamComp,
       'Rounds Won': matchHistoryData.playerRoundsWon,
-      'Rounds Lost': matchHistoryData.playerRoundsLost
+      'Rounds Lost': matchHistoryData.playerRoundsLost,
+      'Agents Played': teamComp
     })
   }
   return `**Match history for ${mapToQuery}**\n\`\`\`${stringTable.create(rows)}\`\`\``
