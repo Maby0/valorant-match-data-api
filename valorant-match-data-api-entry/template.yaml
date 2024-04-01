@@ -1,0 +1,104 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  valorant-match-data-api-entry
+
+Transform:
+- AWS::Serverless-2016-10-31
+
+Globals:
+  Api:
+    OpenApiVersion: 3.0.1
+  Function:
+    Runtime: nodejs18.x
+    Timeout: 30
+    MemorySize: 128
+    Architectures:
+      - x86_64
+
+Resources:
+  ValorantMatchDataApiEntry:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionBody:
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: dist/open-api-specification.yaml
+      Name: !Sub ${AWS::StackName}
+      StageName: dev
+
+  ApiGatewayInvokeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowApiGatewayServiceToAssumeRole
+            Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+      Policies:
+        - PolicyName: InvokeEntryFunction
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  - !GetAtt ValorantMatchDataApiEntryFunction.Arn
+
+  ValorantMatchDataApiEntryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/entry/
+      Environment:
+        Variables:
+          INTERNAL_AWS_STACK_NAME: !ImportValue INTERNAL-AWS-STACK-NAME
+      FunctionName: !Sub ${AWS::StackName}-main-function
+      Handler: handler.handler
+      Role: !GetAtt ValorantMatchDataApiEntryFunctionRole.Arn
+      
+  ValorantMatchDataApiEntryFunctionLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${AWS::StackName}-main-function'
+      RetentionInDays: 30
+
+  ValorantMatchDataApiEntryFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowLambdaToCallInternalFunctions
+            Effect: Allow
+            Action:
+              - sts:AssumeRole
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+      Policies: 
+        - PolicyName: WriteToLogGroup
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+        - PolicyName: InvokeInternalFunctions
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: 
+                  - lambda:InvokeFunction
+                Resource:
+                  - !ImportValue MAP-WINRATE-FUNCTION-ARN
+                  - !ImportValue MATCH-HISTORY-FUNCTION-ARN
