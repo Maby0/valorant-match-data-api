@@ -1,9 +1,8 @@
 import HenrikDevValorantApi from 'unofficial-valorant-api'
 import {
   MABON_NAME,
-  MABON_SMURF_NAME,
-  MABON_SMURF_TAG,
-  MABON_TAG
+  MABON_TAG,
+  PLAYER_NAME
 } from '../../constants/player-names'
 import { ApiMatchData } from '../../types/api-types/api-match-data'
 import {
@@ -14,13 +13,16 @@ import {
   addPlayerTeamDataProperty,
   addOpponentTeamDataProperty,
   addOpponentTeamColourProperty,
-  mapApiMatchDataToCustomMatchData
+  mapApiMatchDataToCustomMatchData,
+  playerTagLookup
 } from './util'
 import { getEnv } from '../../utils/get-env'
 import { putItemToDynamo } from '../../aws/dynamodb/put-item-to-dynamo'
 
-export const handler = async () => {
-  const queryingPlayer = { name: MABON_SMURF_NAME, tag: MABON_SMURF_TAG }
+export const handler = async (customQueryingPlayer?: PLAYER_NAME) => {
+  const queryingPlayer = customQueryingPlayer
+    ? { name: customQueryingPlayer, tag: playerTagLookup(customQueryingPlayer) }
+    : { name: MABON_NAME, tag: MABON_TAG }
   const valorantApi = new HenrikDevValorantApi()
   const responseData = await valorantApi.getMatches({
     region: 'eu',

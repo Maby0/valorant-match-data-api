@@ -1,10 +1,18 @@
-import { TEAM_NAMES_LIST } from '../../constants/player-names'
+import {
+  PLAYER_NAME,
+  PLAYER_TAG_LOOKUP,
+  TEAM_NAMES_LIST
+} from '../../constants/player-names'
 import { BLUE, RED } from '../../constants/team-colours'
 import { ApiMatchData } from '../../types/api-types/api-match-data'
 import { TeamColour } from '../../types/api-types/team'
 import { CustomMatchData } from '../../types/custom-types/custom-match-data'
 import { OpponentTeamData } from '../../types/custom-types/opponent-team-data'
 import { PlayerTeamData } from '../../types/custom-types/player-team-data'
+
+export const playerTagLookup = (playerName: PLAYER_NAME) => {
+  return PLAYER_TAG_LOOKUP[playerName]
+}
 
 export const removeUnnecessaryProperties = (matchData: ApiMatchData) => {
   delete matchData.rounds
