@@ -19,10 +19,16 @@ import {
 import { getEnv } from '../../utils/get-env'
 import { putItemToDynamo } from '../../aws/dynamodb/put-item-to-dynamo'
 
-export const handler = async (customQueryingPlayer?: PLAYER_NAME) => {
-  const queryingPlayer = customQueryingPlayer
-    ? { name: customQueryingPlayer, tag: playerTagLookup(customQueryingPlayer) }
+export const handler = async (params: {
+  customQueryingPlayer?: PLAYER_NAME
+}) => {
+  const queryingPlayer = params.customQueryingPlayer
+    ? {
+        name: params.customQueryingPlayer,
+        tag: playerTagLookup(params.customQueryingPlayer)
+      }
     : { name: MABON_NAME, tag: MABON_TAG }
+
   const valorantApi = new HenrikDevValorantApi()
   const responseData = await valorantApi.getMatches({
     region: 'eu',

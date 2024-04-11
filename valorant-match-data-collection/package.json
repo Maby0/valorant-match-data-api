@@ -2,7 +2,8 @@
     "name": "valorant-match-data-collection",
     "version": "1.0.0",
     "scripts": {
-        "build": "mkdir -p dist && tsc --noEmit && ts-node ./esbuild.config.ts"
+        "build": "mkdir -p dist && tsc --noEmit && ts-node ./esbuild.config.ts",
+        "manual": "./src/scripts/manual-run.sh"
     },
     "dependencies": {
         "@aws-sdk/client-dynamodb": "^3.188.0",
