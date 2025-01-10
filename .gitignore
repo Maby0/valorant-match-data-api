@@ -2,3 +2,4 @@
 */.aws-sam
 */dist
 outputfile.txt
+.env

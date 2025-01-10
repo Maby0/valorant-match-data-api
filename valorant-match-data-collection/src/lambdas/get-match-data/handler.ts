@@ -29,7 +29,7 @@ export const handler = async (params: {
       }
     : { name: MABON_NAME, tag: MABON_TAG }
 
-  const valorantApi = new HenrikDevValorantApi()
+  const valorantApi = new HenrikDevValorantApi(process.env['API_KEY'])
   const responseData = await valorantApi.getMatches({
     region: 'eu',
     name: queryingPlayer.name,
@@ -37,6 +37,7 @@ export const handler = async (params: {
     filter: 'competitive',
     size: 10
   })
+  console.log(responseData)
 
   const matchData = responseData.data as ApiMatchData[]
   console.log(
@@ -55,14 +56,17 @@ export const handler = async (params: {
     return mapApiMatchDataToCustomMatchData(matchData)
   })
 
+  console.log(customMatchDataList)
   console.log('Match data mapped to custom type - sending to DB')
-  await Promise.all(
-    customMatchDataList.map((customMatchData) => {
-      return putItemToDynamo(
-        getEnv('VALORANT_MATCH_DATA_TABLE'),
-        customMatchData
-      )
-    })
-  )
+  // await Promise.all(
+  //   customMatchDataList.map((customMatchData) => {
+  //     return putItemToDynamo(
+  //       getEnv('VALORANT_MATCH_DATA_TABLE'),
+  //       customMatchData
+  //     )
+  //   })
+  // )
   console.log('Match data successfully put to DB')
 }
+
+handler({ customQueryingPlayer: PLAYER_NAME.MABON })
